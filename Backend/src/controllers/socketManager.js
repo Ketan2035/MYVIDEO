@@ -5,10 +5,10 @@ let connections = {}
 let messages = {}
 let timeOnline = {}
 
-export const connectToSocket = (server) => {
+export const connectToSocket = (server, corsOrigins = ["http://localhost:3000"]) => {
     const io = new Server(server, {
         cors: {
-            origin: "*",
+            origin: corsOrigins,
             methods: ["GET", "POST"],
             allowedHeaders: ["*"],
             credentials: true
@@ -117,4 +117,3 @@ export const connectToSocket = (server) => {
 
     return io;
 }
-

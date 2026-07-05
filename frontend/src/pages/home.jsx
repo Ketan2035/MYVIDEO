@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import withAuth from '../utils/withAuth'
 import { useNavigate } from 'react-router-dom'
 import "../App.css";
@@ -39,8 +39,28 @@ function HomeComponent() {
     const [meetingCode, setMeetingCode] = useState('');
     const [inputFocused, setInputFocused] = useState(false);
     const [joining, setJoining] = useState(false);
+    const [creating, setCreating] = useState(false);
+    const [scheduling, setScheduling] = useState(false);
+    const [scheduleTitle, setScheduleTitle] = useState('');
+    const [scheduleDate, setScheduleDate] = useState('');
+    const [shareInfo, setShareInfo] = useState(null);
+    const [feedback, setFeedback] = useState('');
+    const [myMeetings, setMyMeetings] = useState([]);
 
-    const { addToUserHistory } = useContext(AuthContext);
+    const { addToUserHistory, createMeeting, getMyMeetings } = useContext(AuthContext);
+
+    useEffect(() => {
+        const loadMeetings = async () => {
+            try {
+                const meetings = await getMyMeetings();
+                setMyMeetings(meetings);
+            } catch {
+                setMyMeetings([]);
+            }
+        };
+
+        loadMeetings();
+    }, [getMyMeetings]);
 
     const handleJoinVideoCall = async () => {
         if (!meetingCode.trim()) return;
@@ -55,9 +75,82 @@ function HomeComponent() {
         }
     };
 
-    const handleCreateMeeting = () => {
-        const newCode = Math.random().toString(36).substring(2, 10);
-        navigate(`/${newCode}`);
+    const refreshMeetings = async () => {
+        try {
+            const meetings = await getMyMeetings();
+            setMyMeetings(meetings);
+        } catch {
+            setMyMeetings([]);
+        }
+    };
+
+    const handleCreateMeeting = async () => {
+        setCreating(true);
+        setFeedback('');
+        try {
+            const result = await createMeeting({ title: 'Instant Meeting' });
+            setShareInfo(result);
+            await refreshMeetings();
+        } catch (error) {
+            setFeedback(error?.response?.data?.message || 'Could not create meeting.');
+        } finally {
+            setCreating(false);
+        }
+    };
+
+    const handleScheduleMeeting = async () => {
+        if (!scheduleDate) {
+            setFeedback('Choose a date and time for the scheduled meeting.');
+            return;
+        }
+
+        setScheduling(true);
+        setFeedback('');
+        try {
+            const result = await createMeeting({
+                title: scheduleTitle || 'Scheduled Meeting',
+                scheduledFor: new Date(scheduleDate).toISOString()
+            });
+            setShareInfo(result);
+            setScheduleTitle('');
+            setScheduleDate('');
+            await refreshMeetings();
+        } catch (error) {
+            setFeedback(error?.response?.data?.message || 'Could not schedule meeting.');
+        } finally {
+            setScheduling(false);
+        }
+    };
+
+    const handleCopyMeetingLink = async () => {
+        if (!shareInfo?.link) return;
+
+        try {
+            await navigator.clipboard.writeText(shareInfo.link);
+            setFeedback('Meeting link copied.');
+        } catch {
+            setFeedback(shareInfo.link);
+        }
+    };
+
+    const handleStartSharedMeeting = async () => {
+        if (!shareInfo?.code) return;
+        try {
+            await addToUserHistory(shareInfo.code);
+        } catch {
+            // Joining should still work if history cannot be saved.
+        }
+        navigate(`/${shareInfo.code}`);
+    };
+
+    const formatScheduledTime = (value) => {
+        if (!value) return 'Instant';
+        return new Date(value).toLocaleString('en-IN', {
+            day: '2-digit',
+            month: 'short',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
     };
 
     const handleKeyDown = (e) => {
@@ -166,9 +259,161 @@ function HomeComponent() {
                                 fontSize: '0.9rem',
                             }}
                             onClick={handleCreateMeeting}
+                            disabled={creating}
                         >
-                            + Create New Meeting
+                            {creating ? 'Creating...' : '+ Create New Meeting'}
                         </button>
+
+                        {shareInfo && (
+                            <div style={{
+                                marginTop: '1rem',
+                                padding: '1rem',
+                                background: 'rgba(255,255,255,0.05)',
+                                border: '1px solid var(--color-border)',
+                                borderRadius: '10px',
+                            }}>
+                                <p style={{ color: 'var(--text-secondary)', fontSize: '0.78rem', marginBottom: '0.35rem' }}>
+                                    Share this meeting link
+                                </p>
+                                <p style={{
+                                    color: 'var(--text-primary)',
+                                    fontSize: '0.82rem',
+                                    wordBreak: 'break-all',
+                                    marginBottom: '0.75rem',
+                                }}>
+                                    {shareInfo.link}
+                                </p>
+                                <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
+                                    <button
+                                        id="copy-meeting-link-btn"
+                                        style={{ ...btnStyle.base, ...btnStyle.ghost, borderRadius: '10px' }}
+                                        onClick={handleCopyMeetingLink}
+                                    >
+                                        Copy Link
+                                    </button>
+                                    <button
+                                        id="start-created-meeting-btn"
+                                        style={{ ...btnStyle.base, ...btnStyle.primary, borderRadius: '10px' }}
+                                        onClick={handleStartSharedMeeting}
+                                    >
+                                        Start
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
+                        <div style={{
+                            marginTop: '1rem',
+                            padding: '1rem',
+                            border: '1px solid var(--color-border)',
+                            borderRadius: '10px',
+                            background: 'rgba(255,255,255,0.03)',
+                        }}>
+                            <p style={{ color: 'var(--text-primary)', fontSize: '0.9rem', fontWeight: 600, marginBottom: '0.8rem' }}>
+                                Schedule a Meeting
+                            </p>
+                            <input
+                                id="schedule-title-input"
+                                type="text"
+                                placeholder="Meeting title"
+                                value={scheduleTitle}
+                                onChange={(e) => setScheduleTitle(e.target.value)}
+                                style={{
+                                    width: '100%',
+                                    padding: '0.75rem 1rem',
+                                    marginBottom: '0.7rem',
+                                    background: 'rgba(255,255,255,0.05)',
+                                    border: '1px solid var(--color-border)',
+                                    borderRadius: '10px',
+                                    color: 'var(--text-primary)',
+                                    fontSize: '0.9rem',
+                                    fontFamily: "'Inter', sans-serif",
+                                    outline: 'none',
+                                }}
+                            />
+                            <input
+                                id="schedule-date-input"
+                                type="datetime-local"
+                                value={scheduleDate}
+                                onChange={(e) => setScheduleDate(e.target.value)}
+                                style={{
+                                    width: '100%',
+                                    padding: '0.75rem 1rem',
+                                    marginBottom: '0.8rem',
+                                    background: 'rgba(255,255,255,0.05)',
+                                    border: '1px solid var(--color-border)',
+                                    borderRadius: '10px',
+                                    color: 'var(--text-primary)',
+                                    fontSize: '0.9rem',
+                                    fontFamily: "'Inter', sans-serif",
+                                    outline: 'none',
+                                }}
+                            />
+                            <button
+                                id="schedule-meeting-btn"
+                                style={{
+                                    ...btnStyle.base,
+                                    ...btnStyle.ghost,
+                                    width: '100%',
+                                    borderRadius: '10px',
+                                    opacity: scheduling ? 0.7 : 1,
+                                }}
+                                onClick={handleScheduleMeeting}
+                                disabled={scheduling}
+                            >
+                                {scheduling ? 'Scheduling...' : 'Schedule Meeting'}
+                            </button>
+                        </div>
+
+                        {myMeetings.length > 0 && (
+                            <div style={{ marginTop: '1rem' }}>
+                                <p style={{ color: 'var(--text-muted)', fontSize: '0.78rem', marginBottom: '0.6rem' }}>
+                                    Upcoming and recent meetings
+                                </p>
+                                {myMeetings.slice(0, 3).map((meeting) => (
+                                    <div
+                                        key={meeting._id}
+                                        style={{
+                                            display: 'flex',
+                                            justifyContent: 'space-between',
+                                            alignItems: 'center',
+                                            gap: '0.75rem',
+                                            padding: '0.7rem 0',
+                                            borderTop: '1px solid var(--color-border)',
+                                        }}
+                                    >
+                                        <div style={{ minWidth: 0 }}>
+                                            <p style={{ color: 'var(--text-primary)', fontSize: '0.84rem', fontWeight: 600, marginBottom: '0.2rem' }}>
+                                                {meeting.title || 'MyVideo Meeting'}
+                                            </p>
+                                            <p style={{ color: 'var(--text-muted)', fontSize: '0.76rem' }}>
+                                                {meeting.meetingCode} · {formatScheduledTime(meeting.scheduledFor)}
+                                            </p>
+                                        </div>
+                                        <button
+                                            style={{ ...btnStyle.base, ...btnStyle.ghost, padding: '0.45rem 0.8rem', borderRadius: '10px' }}
+                                            onClick={() => setShareInfo({
+                                                code: meeting.meetingCode,
+                                                link: `${window.location.origin}/${meeting.meetingCode}`,
+                                                meeting
+                                            })}
+                                        >
+                                            Share
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
+                        {feedback && (
+                            <p style={{
+                                marginTop: '0.8rem',
+                                color: feedback.includes('copied') ? '#06b6d4' : '#ef4444',
+                                fontSize: '0.8rem',
+                            }}>
+                                {feedback}
+                            </p>
+                        )}
 
                         <p style={{
                             marginTop: '1.5rem',

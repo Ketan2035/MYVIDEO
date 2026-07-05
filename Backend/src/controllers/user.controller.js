@@ -1,21 +1,24 @@
 import httpStatus from "http-status";
 import { User } from "../models/user.model.js";
-import bcrypt, { hash } from "bcrypt"
+import bcrypt from "bcrypt"
 
 import crypto from "crypto"
 import { Meeting } from "../models/meeting.model.js";
+
+const createErrorMessage = (message) => ({ message });
+
 const login = async (req, res) => {
 
     const { username, password } = req.body;
 
     if (!username || !password) {
-        return res.status(400).json({ message: "Please Provide" })
+        return res.status(httpStatus.BAD_REQUEST).json(createErrorMessage("Username and password are required"))
     }
 
     try {
         const user = await User.findOne({ username });
         if (!user) {
-            return res.status(httpStatus.NOT_FOUND).json({ message: "User Not Found" })
+            return res.status(httpStatus.NOT_FOUND).json(createErrorMessage("User Not Found"))
         }
 
 
@@ -23,16 +26,15 @@ const login = async (req, res) => {
 
         if (isPasswordCorrect) {
             let token = crypto.randomBytes(20).toString("hex");
-
             user.token = token;
             await user.save();
             return res.status(httpStatus.OK).json({ token: token })
         } else {
-            return res.status(httpStatus.UNAUTHORIZED).json({ message: "Invalid Username or password" })
+            return res.status(httpStatus.UNAUTHORIZED).json(createErrorMessage("Invalid Username or password"))
         }
 
     } catch (e) {
-        return res.status(500).json({ message: `Something went wrong ${e}` })
+        return res.status(httpStatus.INTERNAL_SERVER_ERROR).json(createErrorMessage("Something went wrong"))
     }
 }
 
@@ -40,11 +42,15 @@ const login = async (req, res) => {
 const register = async (req, res) => {
     const { name, username, password } = req.body;
 
+    if (!name || !username || !password) {
+        return res.status(httpStatus.BAD_REQUEST).json(createErrorMessage("Name, username and password are required"));
+    }
+
 
     try {
         const existingUser = await User.findOne({ username });
         if (existingUser) {
-            return res.status(httpStatus.FOUND).json({ message: "User already exists" });
+            return res.status(httpStatus.CONFLICT).json(createErrorMessage("User already exists"));
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -56,11 +62,10 @@ const register = async (req, res) => {
         });
 
         await newUser.save();
-
         res.status(httpStatus.CREATED).json({ message: "User Registered" })
 
     } catch (e) {
-        res.json({ message: `Something went wrong ${e}` })
+        res.status(httpStatus.INTERNAL_SERVER_ERROR).json(createErrorMessage("Something went wrong"))
     }
 
 }
@@ -69,20 +74,35 @@ const register = async (req, res) => {
 const getUserHistory = async (req, res) => {
     const { token } = req.query;
 
+    if (!token) {
+        return res.status(httpStatus.UNAUTHORIZED).json(createErrorMessage("Authentication token is required"));
+    }
+
     try {
         const user = await User.findOne({ token: token });
+        if (!user) {
+            return res.status(httpStatus.UNAUTHORIZED).json(createErrorMessage("Invalid or expired token"));
+        }
+
         const meetings = await Meeting.find({ user_id: user.username })
         res.json(meetings)
     } catch (e) {
-        res.json({ message: `Something went wrong ${e}` })
+        res.status(httpStatus.INTERNAL_SERVER_ERROR).json(createErrorMessage("Something went wrong"))
     }
 }
 
 const addToHistory = async (req, res) => {
     const { token, meeting_code } = req.body;
 
+    if (!token || !meeting_code) {
+        return res.status(httpStatus.BAD_REQUEST).json(createErrorMessage("Authentication token and meeting code are required"));
+    }
+
     try {
         const user = await User.findOne({ token: token });
+        if (!user) {
+            return res.status(httpStatus.UNAUTHORIZED).json(createErrorMessage("Invalid or expired token"));
+        }
 
         const newMeeting = new Meeting({
             user_id: user.username,
@@ -93,7 +113,7 @@ const addToHistory = async (req, res) => {
 
         res.status(httpStatus.CREATED).json({ message: "Added code to history" })
     } catch (e) {
-        res.json({ message: `Something went wrong ${e}` })
+        res.status(httpStatus.INTERNAL_SERVER_ERROR).json(createErrorMessage("Something went wrong"))
     }
 }
 

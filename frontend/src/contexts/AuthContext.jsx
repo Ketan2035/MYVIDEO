@@ -11,6 +11,10 @@ const client = axios.create({
     baseURL: `${server}/api/v1/users`
 })
 
+const meetingClient = axios.create({
+    baseURL: `${server}/api/v1/meetings`
+})
+
 
 export const AuthProvider = ({ children }) => {
 
@@ -84,9 +88,35 @@ export const AuthProvider = ({ children }) => {
         }
     }
 
+    const createMeeting = async ({ title, scheduledFor } = {}) => {
+        try {
+            const request = await meetingClient.post("/create", {
+                token: localStorage.getItem("token"),
+                title,
+                scheduledFor
+            });
+            return request.data;
+        } catch (e) {
+            throw e;
+        }
+    }
+
+    const getMyMeetings = async () => {
+        try {
+            const request = await meetingClient.get("/mine", {
+                params: {
+                    token: localStorage.getItem("token")
+                }
+            });
+            return request.data;
+        } catch (e) {
+            throw e;
+        }
+    }
+
 
     const data = {
-        userData, setUserData, addToUserHistory, getHistoryOfUser, handleRegister, handleLogin
+        userData, setUserData, addToUserHistory, getHistoryOfUser, handleRegister, handleLogin, createMeeting, getMyMeetings
     }
 
     return (

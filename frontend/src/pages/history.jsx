@@ -8,7 +8,6 @@ export default function History() {
     const [loading, setLoading] = useState(true);
     const routeTo = useNavigate();
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         const fetchHistory = async () => {
             try {
@@ -21,7 +20,7 @@ export default function History() {
             }
         };
         fetchHistory();
-    }, []);
+    }, [getHistoryOfUser]);
 
     const formatDate = (dateString) => {
         const date = new Date(dateString);

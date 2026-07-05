@@ -12,21 +12,21 @@
     min-height: 100vh;
     background: var(--color-bg);
     background-image:
-        radial-gradient(ellipse 70% 50% at 50% 0%, rgba(124,58,237,0.15) 0%, transparent 60%),
-        radial-gradient(ellipse 50% 40% at 90% 90%, rgba(6,182,212,0.08) 0%, transparent 50%);
+        radial-gradient(ellipse 70% 50% at 50% 0%, rgba(124, 58, 237, 0.15) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 40% at 90% 90%, rgba(6, 182, 212, 0.08) 0%, transparent 50%);
     padding: 2rem;
     gap: 2rem;
 }
 
 .lobbyCard {
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 24px;
     padding: 2.5rem 2.5rem 2rem;
     width: 100%;
     max-width: 480px;
     backdrop-filter: blur(20px);
-    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
 }
 
 .lobbyBrand {
@@ -64,15 +64,15 @@
     border-radius: 14px;
     background: #0d0d1a;
     object-fit: cover;
-    border: 1px solid rgba(255,255,255,0.08);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     margin-bottom: 1.5rem;
 }
 
 .lobbyInput {
     width: 100%;
     padding: 0.8rem 1.1rem;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 10px;
     color: var(--text-primary);
     font-size: 0.95rem;
@@ -84,8 +84,8 @@
 
 .lobbyInput:focus {
     border-color: #7c3aed;
-    box-shadow: 0 0 0 3px rgba(124,58,237,0.15);
-    background: rgba(124,58,237,0.05);
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
+    background: rgba(124, 58, 237, 0.05);
 }
 
 .lobbyInput::placeholder {
@@ -103,13 +103,13 @@
     font-weight: 600;
     font-family: 'Inter', sans-serif;
     cursor: pointer;
-    box-shadow: 0 0 25px rgba(124,58,237,0.4);
+    box-shadow: 0 0 25px rgba(124, 58, 237, 0.4);
     transition: all 250ms ease;
 }
 
 .lobbyConnectBtn:hover {
     transform: translateY(-1px);
-    box-shadow: 0 0 40px rgba(124,58,237,0.6);
+    box-shadow: 0 0 40px rgba(124, 58, 237, 0.6);
 }
 
 .lobbyConnectBtn:disabled {
@@ -145,7 +145,7 @@
     border-radius: 14px;
     object-fit: cover;
     background: #0d0d1a;
-    border: 1px solid rgba(255,255,255,0.06);
+    border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 /* Local (self) video */
@@ -157,8 +157,8 @@
     width: auto;
     aspect-ratio: 16/9;
     border-radius: 12px;
-    border: 2px solid rgba(124,58,237,0.5);
-    box-shadow: 0 0 20px rgba(124,58,237,0.3), 0 8px 30px rgba(0,0,0,0.5);
+    border: 2px solid rgba(124, 58, 237, 0.5);
+    box-shadow: 0 0 20px rgba(124, 58, 237, 0.3), 0 8px 30px rgba(0, 0, 0, 0.5);
     object-fit: cover;
     z-index: 10;
     background: #0d0d1a;
@@ -176,7 +176,7 @@
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    background: linear-gradient(to top, rgba(8,8,16,0.95) 0%, transparent 100%);
+    background: linear-gradient(to top, rgba(8, 8, 16, 0.95) 0%, transparent 100%);
     backdrop-filter: blur(10px);
     padding: 0 2rem;
     z-index: 20;
@@ -193,26 +193,26 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(255,255,255,0.1);
-    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
     color: white;
     cursor: pointer;
     transition: all 200ms ease;
 }
 
 .controlBtn:hover {
-    background: rgba(255,255,255,0.18);
+    background: rgba(255, 255, 255, 0.18);
     transform: scale(1.08);
 }
 
 .controlBtnDanger {
-    background: rgba(239,68,68,0.2) !important;
-    border-color: rgba(239,68,68,0.4) !important;
+    background: rgba(239, 68, 68, 0.2) !important;
+    border-color: rgba(239, 68, 68, 0.4) !important;
     color: #ef4444 !important;
 }
 
 .controlBtnDanger:hover {
-    background: rgba(239,68,68,0.35) !important;
+    background: rgba(239, 68, 68, 0.35) !important;
 }
 
 /* ─── CHAT PANEL ──────────────────────────────────────────── */
@@ -224,12 +224,12 @@
     height: 100vh;
     width: 320px;
     background: rgba(12, 12, 22, 0.97);
-    border-left: 1px solid rgba(255,255,255,0.08);
+    border-left: 1px solid rgba(255, 255, 255, 0.08);
     backdrop-filter: blur(20px);
     z-index: 30;
     display: flex;
     flex-direction: column;
-    box-shadow: -10px 0 40px rgba(0,0,0,0.5);
+    box-shadow: -10px 0 40px rgba(0, 0, 0, 0.5);
 }
 
 .chatContainer {
@@ -240,7 +240,7 @@
 
 .chatHeader {
     padding: 1.2rem 1.4rem;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -256,8 +256,8 @@
 }
 
 .chatCloseBtn {
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     borderRadius: 8px;
     color: var(--text-secondary);
     cursor: pointer;
@@ -269,7 +269,7 @@
 }
 
 .chatCloseBtn:hover {
-    background: rgba(255,255,255,0.12);
+    background: rgba(255, 255, 255, 0.12);
     color: var(--text-primary);
 }
 
@@ -297,8 +297,8 @@
 }
 
 .chatMessageBubble {
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 0 12px 12px 12px;
     padding: 0.55rem 0.9rem;
     font-size: 0.88rem;
@@ -309,7 +309,7 @@
 
 .chattingArea {
     padding: 1rem 1.2rem;
-    border-top: 1px solid rgba(255,255,255,0.08);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
     display: flex;
     gap: 0.6rem;
     align-items: flex-end;
@@ -319,8 +319,8 @@
 .chatInput {
     flex: 1;
     padding: 0.65rem 0.9rem;
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 10px;
     color: var(--text-primary);
     font-size: 0.88rem;
@@ -332,7 +332,7 @@
 
 .chatInput:focus {
     border-color: #7c3aed;
-    box-shadow: 0 0 0 2px rgba(124,58,237,0.15);
+    box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.15);
 }
 
 .chatInput::placeholder {
@@ -354,7 +354,7 @@
 }
 
 .chatSendBtn:hover {
-    box-shadow: 0 0 15px rgba(124,58,237,0.4);
+    box-shadow: 0 0 15px rgba(124, 58, 237, 0.4);
 }
 
 .noMessages {
